@@ -1,0 +1,11 @@
+django
+selenium
+django-filter
+pyinstaller
+auto-py-to-exe
+pyfiglet
+termcolor
+waitress
+colorama
+wmi
+pywin32

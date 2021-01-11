@@ -1,0 +1,98 @@
+{% extends 'master.html' %}
+
+{% block title %}Files{% endblock title %}
+{% block body %}
+<style>
+  #delete-button {
+    color: white;
+  }
+</style>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Create File</h4>
+        <h6 class="card-subtitle"></h6>
+        <h6 class="card-title m-t-40"></h6>
+        <form class="form-horizontal form-material" method="post" action="{% url 'csv_upload' %}"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="col-md-12">Name</label>
+            <div class="col-md-12">
+              <input name="name" type="text" placeholder="My File" class="form-control form-control-line">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button class="btn btn-success">Upload File</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Files Uploaded</h4>
+        <h6 class="card-subtitle"></h6>
+        <h6 class="card-title m-t-40"></h6>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Filename</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for list in data %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ list.name }}</td>
+                <td>{{ list.filename }}</td>
+                <td>
+                  <button class="btn btn-danger" id="{{list.id}}">Delete</button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock body %}
+
+{% block script %}
+<script>
+  $('button.btn-danger').click(function (event) {
+    $.ajax({
+      url: {% url 'csv_upload' %},
+      method: 'delete',
+      contentType: 'application/json',
+      headers: {
+      'X-CSRFToken': '{{csrf_token}}'
+    },
+      data: JSON.stringify({
+        'id': event.target.id
+      }),
+      success: function (response) {
+        Swal.fire({
+          icon: 'success',
+          title: response['msg'],
+          confirmButtonText: 'Yes',
+        }).then((result) => {
+          window.location = location.href
+        })
+      }
+  })
+})
+
+</script>
+{% endblock script %}

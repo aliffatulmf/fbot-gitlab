@@ -1,0 +1,87 @@
+{% extends 'master.html' %}
+
+{% block title %}
+Uploader
+{% endblock title %}
+
+{% block body %}
+{% load static %}
+<style>
+    #upload-button {
+        color: white;
+    }
+</style>
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">List</h4>
+                <h6 class="card-subtitle"></h6>
+                <h6 class="card-title m-t-40"></h6>
+                <div class="table-responsive">
+                    <div class="form-group">
+                        <label class="col-sm-12">Profile</label>
+                        <div class="col-sm-12">
+                            <select class="form-control form-control-line" name="profile" id="profile">
+                                <option disabled selected value>PROFILE</option>
+                                {% for list in profiles %}
+                                <option value="{{list.pk}}">
+                                    {{list.name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12">File</label>
+                        <div class="col-sm-12">
+                            <select class="form-control form-control-line" name="collection" id="collection">
+                                <option disabled selected value>FILE</option>
+                                {% for list in files %}
+                                <option value="{{list.pk}}">
+                                    {{list.name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label class="col">Delay</lable>
+                            <input type="number" class="form-control" id="delay" placeholder="60" />
+                    </div> -->
+                    {% csrf_token %}
+                    <button class="btn btn-success">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+{% block script %}
+<script src="https://cdn.statically.io/gl/aal18/fbot-assets/master/dist/js/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("button").click(function () {
+            $.ajax({
+                url: {% url 'uploadControl' %},
+                method: 'post',
+                contentType: 'application/json; charset=utf-8',
+                headers: {
+                'X-CSRFToken': '{{csrf_token}}'
+            },
+                data: JSON.stringify({
+                    'profile': $("#profile").val(),
+                    'file': $("#collection").val(),
+                }),
+                success: function (response) {
+                    Swal.fire({
+                        icon: response.status,
+                        title: response.msg
+                    })
+                }
+        })
+    })
+})
+</script>
+{% endblock script %}
