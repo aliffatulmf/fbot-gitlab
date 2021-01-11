@@ -1,12 +1,7 @@
 import csv
 import json
-import os
 import pathlib
-import platform
-import shutil
-import signal
 import uuid
-import datetime
 from threading import Thread
 
 from django.db.transaction import atomic
@@ -15,15 +10,9 @@ from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls.base import reverse
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-from fbot.settings import BASE_DIR
 
-from robot import *
-from robot import CONFIG_DIR, separator
-from robot.forms import CSVCollectionForm
 from robot.models import ChromeProfile, CSVCollection
-from robot.profiles.profiles import login_session, make_profile
-from robot.route.mobile import Driver, Mobile, interface
+from robot.route.mobile import interface
 from robot.utils import Util
 
 
@@ -32,7 +21,14 @@ class Files(View):
 
     def write_file(self, filename):
         with open(filename, mode="w", encoding="utf-8", newline="") as cfile:
-            fields = ["NAME", "PRICE", "IMAGES", "CATEGORY", "LOCATION", "DESCRIPTION"]
+            fields = [
+                "NAME",
+                "PRICE",
+                "IMAGES",
+                "CATEGORY",
+                "LOCATION",
+                "DESCRIPTION",
+            ]
 
             wf = csv.DictWriter(cfile, fieldnames=fields)
             wf.writeheader()
@@ -54,7 +50,7 @@ class Files(View):
         try:
             query = CSVCollection(name=name, filename=filename, path=path)
             query.save()
-        except:
+        except Exception:
             self.UTIL.remove_file(filepath)
             return HttpResponse("<h1>Error</h1>")
 
@@ -72,7 +68,7 @@ class Files(View):
             if remove:
                 query.delete()
 
-        except Exception as e:
+        except Exception:
             return JsonResponse({"msg": "ERROR"})
 
         return JsonResponse({"msg": "SUCCESS"})
@@ -143,7 +139,7 @@ class Control(View):
 
             thread = Thread(target=interface, args=(PROFILE.path, FILE))
             thread.start()
-        except Exception as e:
+        except Exception:
             return JsonResponse({"status": "error", "msg": "Error"})
 
         return JsonResponse({"status": "success", "msg": "OK"})
